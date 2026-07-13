@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PUBG Mobile Memory Patcher</title>
+    <style>
+        :root {
+            --bg-color: #0b0c10;
+            --card-bg: #1f2833;
+            --accent-color: #45f3ff;
+            --text-color: #c5c6c7;
+            --text-bright: #ffffff;
+            --success-color: #00ffcc;
+            --terminal-bg: #020205;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Courier New', Courier, monospace;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            padding: 15px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .app-container {
+            width: 100%;
+            max-width: 850px;
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            border: 2px solid var(--accent-color);
+            overflow: hidden;
+            box-shadow: 0 0 30px rgba(69, 243, 255, 0.2);
+        }
+
+        header {
+            background-color: #0b0c10;
+            padding: 20px;
+            text-align: center;
+            border-bottom: 2px solid var(--accent-color);
+        }
+
+        header h1 {
+            font-size: 18px;
+            color: var(--accent-color);
+            margin-bottom: 5px;
+            text-shadow: 0 0 10px rgba(69, 243, 255, 0.5);
+        }
+
+        header p {
+            font-size: 11px;
+            color: var(--text-color);
+        }
+
+        .system-status {
+            display: flex;
+            justify-content: space-around;
+            background-color: #020205;
+            padding: 12px;
+            border-bottom: 1px solid #1f2833;
+            font-size: 13px;
+        }
+
+        .status-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .indicator {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background-color: #ff3366;
+            transition: 0.3s;
+        }
+
+        .indicator.active {
+            background-color: var(--success-color);
+            box-shadow: 0 0 10px var(--success-color);
+        }
+
+        .permission-btn {
+            background-color: #1f2833;
+            color: var(--accent-color);
+            border: 1px solid var(--accent-color);
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 11px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .permission-btn.granted {
+            background-color: var(--success-color);
+            color: black;
+            border-color: var(--success-color);
+        }
+
+        .tabs {
+            display: flex;
+            background-color: #0b0c10;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 15px 10px;
+            background: none;
+            border: none;
+            color: var(--text-color);
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            text-align: center;
+        }
+
+        .tab-btn.active {
+            color: var(--accent-color);
+            background-color: var(--card-bg);
+            border-bottom: 3px solid var(--accent-color);
+        }
+
+        .content-panel {
+            display: none;
+            padding: 20px;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 15px;
+        }
+
+        .content-panel.active {
+            display: grid;
+        }
+
+        .item-card {
+            background-color: #151a21;
+            border: 1px solid #2e3b4e;
+            border-radius: 8px;
+            padding: 12px;
+            text-align: center;
+        }
+
+        .item-name {
+            font-size: 13px;
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: var(--text-bright);
+        }
+
+        .item-id {
+            font-size: 11px;
+            color: var(--accent-color);
+            margin-bottom: 12px;
+        }
+
+        .action-btn {
+            width: 100%;
+            padding: 8px;
+            background-color: #1f2833;
+            color: #fff;
+            border: 1px solid #2e3b4e;
+            border-radius: 4px;
+            font-size: 11px;
+            cursor: pointer;
+        }
+
+        .action-btn.active {
+            background-color: var(--success-color);
+            color: #000;
+        }
+
+        .terminal-container {
+            background-color: var(--terminal-bg);
+            padding: 15px;
+            border-top: 2px solid var(--accent-color);
+            font-size: 12px;
+        }
+
+        .terminal-header {
+            display: flex;
+            justify-content: space-between;
+            color: var(--accent-color);
+            margin-bottom: 8px;
+        }
+
+        .terminal-log {
+            height: 120px;
+            overflow-y: auto;
+            color: var(--success-color);
+            line-height: 1.6;
+            white-space: pre-wrap;
+        }
+
+        .terminal-input-row {
+            display: flex;
+            margin-top: 10px;
+            gap: 10px;
+        }
+
+        .terminal-input {
+            flex: 1;
+            background-color: #020205;
+            border: 1px solid #2e3b4e;
+            color: var(--success-color);
+            padding: 8px;
+            border-radius: 4px;
+        }
+
+        .run-btn {
+            background-color: var(--accent-color);
+            color: #000;
+            border: none;
+            padding: 8px 20px;
+            font-weight: bold;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+        <header>
+            <h1>PUBG MOBILE MEMORY INJECTOR (NDK DIRECT INTERFACE)</h1>
+            <p>DIRECT PROCESS WRITE SYSTEM - ROOT AND PTRACE PRIVILEGES REQUIRED</p>
+        </header>
+
+        <div class="system-status">
+            <div class="status-item">
+                <span>الروت:</span>
+                <span class="indicator" id="rootInd"></span>
+                <button class="permission-btn" id="rootBtn" onclick="requestRoot()">تفعيل</button>
+            </div>
+            <div class="status-item">
+                <span>الملفات:</span>
+                <span class="indicator" id="storageInd"></span>
+                <button class="permission-btn" id="storageBtn" onclick="requestStorage()">تفعيل</button>
+            </div>
+            <div class="status-item">
+                <span>جدار الحماية:</span>
+                <span class="indicator" id="bypassInd"></span>
+                <button class="permission-btn" id="bypassBtn" onclick="activateBypass()">تشغيل</button>
+            </div>
+        </div>
+
+        <div class="tabs">
+            <button class="tab-btn active" onclick="switchTab(event, 'skins')">1. الملابس</button>
+            <button class="tab-btn" onclick="switchTab(event, 'guns')">2. الأسلحة</button>
+        </div>
+
+        <div id="skins" class="content-panel active">
+            <div class="item-card">
+                <div class="item-name">بدلة الفرعون (X-Suit)</div>
+                <div class="item-id">Address: 0x10A94F80</div>
+                <button class="action-btn" onclick="injectMemory('0x10A94F80', '1010081', this)">حقن الذاكرة الحقيقي</button>
+            </div>
+            <div class="item-card">
+                <div class="item-name">بدلة الغراب</div>
+                <div class="item-id">Address: 0x10A94FA4</div>
+                <button class="action-btn" onclick="injectMemory('0x10A94FA4', '1010092', this)">حقن الذاكرة الحقيقي</button>
+            </div>
+        </div>
+
+        <div id="guns" class="content-panel">
+            <div class="item-card">
+                <div class="item-name">M416 - الثلجي</div>
+                <div class="item-id">Address: 0x12F8B400</div>
+                <button class="action-btn" onclick="injectMemory('0x12F8B400', '2010005', this)">حقن الذاكرة الحقيقي</button>
+            </div>
+        </div>
+
+        <div class="terminal-container">
+            <div class="terminal-header">
+                <span>SYSTEM AGENT LOG</span>
+                <span>root@android:/#</span>
+            </div>
+            <div class="terminal-log" id="termLog">[SYSTEM] يرجى التأكد من تفعيل الروت وجدار الحماية للبدء في قراءة وحقن قيم الذاكرة...</div>
+            <div class="terminal-input-row">
+                <input type="text" class="terminal-input" id="cmdInput" placeholder="أدخل أمر Shell الحقيقي..." onkeydown="checkEnter(event)">
+                <button class="run-btn" onclick="execCommand()">تنفيذ</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const logArea = document.getElementById('termLog');
+        let bypassActive = false;
+        let rootActive = false;
+
+        function appendLog(text, type = 'info') {
+            const time = new Date().toLocaleTimeString();
+            let color = '#00ffcc';
+            if (type === 'error') color = '#ff3366';
+            if (type === 'warn') color = '#ffcc00';
+            if (type === 'sys') color = '#45f3ff';
+            logArea.innerHTML += `\n<span style="color: ${color}">[${time}] ${text}</span>`;
+            logArea.scrollTop = logArea.scrollHeight;
+        }
+
+        function requestRoot() {
+            if (typeof AndroidBridge !== 'undefined') {
+                AndroidBridge.requestRootPermission();
+            } else {
+                appendLog("خطأ: لم يتم كشف واجهة AndroidBridge للروت.", "error");
+            }
+        }
+
+        function requestStorage() {
+            if (typeof AndroidBridge !== 'undefined') {
+                AndroidBridge.requestStoragePermission();
+            } else {
+                appendLog("خطأ: لم يتم كشف واجهة AndroidBridge للملفات.", "error");
+            }
+        }
+
+        function activateBypass() {
+            if (typeof AndroidBridge !== 'undefined') {
+                AndroidBridge.activateAntiCheatBypass();
+            } else {
+                appendLog("خطأ: لم يتم كشف واجهة AndroidBridge للجدار الناري.", "error");
+            }
+        }
+
+        function updatePermissionStatus(type, granted) {
+            const indicator = document.getElementById(`${type}Ind`);
+            const btn = document.getElementById(`${type}Btn`);
+            if (granted) {
+                indicator.classList.add('active');
+                btn.textContent = "نشط ✓";
+                btn.classList.add('granted');
+                btn.disabled = true;
+                appendLog(`[SYSTEM] تم تفعيل [${type.toUpperCase()}] حقيقي وبنجاح!`, "sys");
+                if (type === 'bypass') bypassActive = true;
+                if (type === 'root') rootActive = true;
+            }
+        }
+
+        function switchTab(evt, tabName) {
+            const panels = document.getElementsByClassName("content-panel");
+            for (let i = 0; i < panels.length; i++) {
+                panels[i].classList.remove("active");
+            }
+            const tabs = document.getElementsByClassName("tab-btn");
+            for (let i = 0; i < tabs.length; i++) {
+                tabs[i].classList.remove("active");
+            }
+            document.getElementById(tabName).classList.add("active");
+            evt.currentTarget.classList.add("active");
+        }
+
+        function injectMemory(offsetAddress, assetValue, btn) {
+            if (!rootActive) {
+                appendLog("خطأ: يجب منح التطبيق صلاحيات الروت (SuperUser) للوصول للذاكرة الحقيقية للعبة.", "error");
+                return;
+            }
+            if (typeof AndroidBridge !== 'undefined') {
+                appendLog(`جاري طلب حقن القيمة ${assetValue} في العنوان ${offsetAddress}...`, "info");
+                AndroidBridge.injectSkin(offsetAddress, assetValue);
+                btn.classList.add('active');
+                btn.textContent = "تم الحقن";
+            } else {
+                appendLog("خطأ: تطبيق الويب لا يعمل داخل بيئة WebView الحقيقية.", "error");
+            }
+        }
+
+        function execCommand() {
+            const input = document.getElementById('cmdInput');
+            const cmd = input.value.trim();
+            if (!cmd) return;
+
+            appendLog(`root@android:/# ${cmd}`, 'info');
+            if (typeof AndroidBridge !== 'undefined') {
+                const res = AndroidBridge.executeShell(cmd);
+                appendLog(res, 'sys');
+            } else {
+                appendLog("خطأ: لا يوجد اتصال نشط بنظام أندرويد لتنفيذ أوامر الـ Shell.", "error");
+            }
+            input.value = '';
+        }
+
+        function checkEnter(event) {
+            if (event.key === 'Enter') {
+                execCommand();
+            }
+        }
+    </script>
+</body>
+</html>
