@@ -16,16 +16,40 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: Setup Android Project
+      - name: Setup Android Project Structure
         run: |
-          echo "Creating standard directory structure..."
+          echo "Building clean structure..."
           mkdir -p app/src/main/assets
           mkdir -p app/src/main/java/com/asaad/patcher
           mkdir -p gradle/wrapper
 
-          # Move user files if they exist
+          # Move your HTML file
           [ -f index.html ] && mv index.html app/src/main/assets/
-          [ -f MainActivity.kt ] && mv MainActivity.kt app/src/main/java/com/asaad/patcher/
+
+          # Write Clean Java MainActivity to avoid Kotlin compiler errors
+          cat <<EOF > app/src/main/java/com/asaad/patcher/MainActivity.java
+          package com.asaad.patcher;
+          
+          import android.app.Activity;
+          import android.os.Bundle;
+          import android.webkit.WebSettings;
+          import android.webkit.WebView;
+          import android.webkit.WebViewClient;
+
+          public class MainActivity extends Activity {
+              @Override
+              protected void onCreate(Bundle savedInstanceState) {
+                  super.onCreate(savedInstanceState);
+                  WebView webView = new WebView(this);
+                  WebSettings webSettings = webView.getSettings();
+                  webSettings.setJavaScriptEnabled(true);
+                  webSettings.setDomStorageEnabled(true);
+                  webView.setWebViewClient(new WebViewClient());
+                  webView.loadUrl("file:///android_asset/index.html");
+                  setContentView(webView);
+              }
+          }
+          EOF
 
           # Root settings.gradle
           cat <<EOF > settings.gradle
@@ -51,7 +75,6 @@ jobs:
           cat <<EOF > build.gradle
           plugins {
               id 'com.android.application' version '8.2.2' apply false
-              id 'org.jetbrains.kotlin.android' version '1.9.22' apply false
           }
           EOF
 
@@ -59,7 +82,6 @@ jobs:
           cat <<EOF > app/build.gradle
           plugins {
               id 'com.android.application'
-              id 'org.jetbrains.kotlin.android'
           }
           android {
               namespace 'com.asaad.patcher'
@@ -80,12 +102,8 @@ jobs:
                   sourceCompatibility JavaVersion.VERSION_17
                   targetCompatibility JavaVersion.VERSION_17
               }
-              kotlinOptions {
-                  jvmTarget = '17'
-              }
           }
           dependencies {
-              implementation 'androidx.core:core-ktx:1.12.0'
               implementation 'androidx.appcompat:appcompat:1.6.1'
           }
           EOF
@@ -98,7 +116,6 @@ jobs:
               <application
                   android:allowBackup="true"
                   android:label="Patcher App"
-                  android:supportsRtl="true"
                   android:theme="@android:style/Theme.DeviceDefault.NoActionBar">
                   <activity
                       android:name="com.asaad.patcher.MainActivity"
@@ -112,13 +129,17 @@ jobs:
           </manifest>
           EOF
 
-          echo "Downloading stable Gradle distribution..."
-          curl -LO https://raw.githubusercontent.com/gradle/gradle/v8.2.0/gradlew
-          curl -LO https://raw.githubusercontent.com/gradle/gradle/v8.2.0/gradle/wrapper/gradle-wrapper.jar
-          curl -LO https://raw.githubusercontent.com/gradle/gradle/v8.2.0/gradle/wrapper/gradle-wrapper.properties
+          # Download Pure Stable Gradle 8.2
+          curl -LO https://services.gradle.org/distributions/gradle-8.2-bin.zip
+          mkdir -p gradle/wrapper
+          echo "distributionBase=GRADLE_USER_HOME" > gradle/wrapper/gradle-wrapper.properties
+          echo "distributionPath=wrapper/dists" >> gradle/wrapper/gradle-wrapper.properties
+          echo "zipStoreBase=GRADLE_USER_HOME" >> gradle/wrapper/gradle-wrapper.properties
+          echo "zipStorePath=wrapper/dists" >> gradle/wrapper/gradle-wrapper.properties
+          echo "distributionUrl=https\://services.gradle.org/distributions/gradle-8.2-bin.zip" >> gradle/wrapper/gradle-wrapper.properties
           
-          mv gradle-wrapper.jar gradle/wrapper/
-          mv gradle-wrapper.properties gradle/wrapper/
+          # Fix gradlew execution
+          curl -LO https://raw.githubusercontent.com/gradle/gradle/v8.2.0/gradlew
           chmod +x gradlew
 
       - name: Build with Gradle
