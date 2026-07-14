@@ -21,9 +21,8 @@ jobs:
           echo "Building clean structure..."
           mkdir -p app/src/main/assets
           mkdir -p app/src/main/java/com/asaad/patcher
-          mkdir -p gradle/wrapper
 
-          # Move your HTML file
+          # Move your HTML file if it exists
           [ -f index.html ] && mv index.html app/src/main/assets/
 
           # Write Clean Java MainActivity to avoid Kotlin compiler errors
@@ -103,9 +102,6 @@ jobs:
                   targetCompatibility JavaVersion.VERSION_17
               }
           }
-          dependencies {
-              implementation 'androidx.appcompat:appcompat:1.6.1'
-          }
           EOF
 
           # AndroidManifest.xml
@@ -129,17 +125,10 @@ jobs:
           </manifest>
           EOF
 
-          # Download Pure Stable Gradle 8.2
-          curl -LO https://services.gradle.org/distributions/gradle-8.2-bin.zip
-          mkdir -p gradle/wrapper
-          echo "distributionBase=GRADLE_USER_HOME" > gradle/wrapper/gradle-wrapper.properties
-          echo "distributionPath=wrapper/dists" >> gradle/wrapper/gradle-wrapper.properties
-          echo "zipStoreBase=GRADLE_USER_HOME" >> gradle/wrapper/gradle-wrapper.properties
-          echo "zipStorePath=wrapper/dists" >> gradle/wrapper/gradle-wrapper.properties
-          echo "distributionUrl=https\://services.gradle.org/distributions/gradle-8.2-bin.zip" >> gradle/wrapper/gradle-wrapper.properties
-          
-          # Fix gradlew execution
-          curl -LO https://raw.githubusercontent.com/gradle/gradle/v8.2.0/gradlew
+      - name: Generate Local Gradle Wrapper
+        run: |
+          echo "Generating Gradle wrapper locally via system tools..."
+          gradle wrapper --gradle-version 8.2
           chmod +x gradlew
 
       - name: Build with Gradle
