@@ -29,6 +29,7 @@ jobs:
           cat <<EOF > app/src/main/AndroidManifest.xml
           <manifest xmlns:android="http://schemas.android.com/apk/res/android"
               package="com.asaad.patcher">
+              <uses-permission android:name="android.permission.INTERNET"/>
               <application
                   android:allowBackup="true"
                   android:label="Patcher App"
@@ -95,7 +96,13 @@ jobs:
               }
               kotlinOptions {
                   jvmTarget = '17'
-                }
+              }
+              dependencies {
+                  implementation 'androidx.core:core-ktx:1.12.0'
+                  implementation 'androidx.appcompat:appcompat:1.6.1'
+                  implementation 'com.google.android.material:material:1.11.0'
+                  implementation 'androidx.webkit:webkit:1.9.0'
+              }
           }
           EOF
 
@@ -110,7 +117,7 @@ jobs:
 
       - name: Build with Gradle
         run: |
-          ./gradlew assembleDebug
+          ./gradlew assembleDebug --no-daemon
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
