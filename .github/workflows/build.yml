@@ -95,14 +95,14 @@ jobs:
               }
               kotlinOptions {
                   jvmTarget = '17'
-              }
+                }
           }
           EOF
 
-          echo "Downloading Gradle Wrapper..."
-          curl -LO https://raw.githubusercontent.com/gradle/gradle/v8.2.0/gradlew
-          curl -LO https://raw.githubusercontent.com/gradle/gradle/v8.2.0/gradle/wrapper/gradle-wrapper.jar
-          curl -LO https://raw.githubusercontent.com/gradle/gradle/v8.2.0/gradle/wrapper/gradle-wrapper.properties
+          echo "Downloading Stable Gradle Wrapper..."
+          curl -LO https://raw.githubusercontent.com/gradle/gradle/v8.5.0/gradlew
+          curl -LO https://raw.githubusercontent.com/gradle/gradle/v8.5.0/gradle/wrapper/gradle-wrapper.jar
+          curl -LO https://raw.githubusercontent.com/gradle/gradle/v8.5.0/gradle/wrapper/gradle-wrapper.properties
           
           mv gradle-wrapper.jar gradle/wrapper/
           mv gradle-wrapper.properties gradle/wrapper/
