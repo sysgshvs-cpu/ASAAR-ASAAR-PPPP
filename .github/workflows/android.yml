@@ -14,12 +14,11 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
           
-      # السطرين التاليين هما الحل للمشكلة:
-      - name: Create Gradle Wrapper
-        run: gradle wrapper
-          
+      # حذفنا خطوة gradle wrapper واستبدلناها بأمر مباشر للتحميل
       - name: Build with Gradle
-        run: ./gradlew assembleDebug
+        run: |
+          chmod +x gradlew || true
+          ./gradlew assembleDebug || gradle assembleDebug
         
       - name: Upload APK
         uses: actions/upload-artifact@v4
