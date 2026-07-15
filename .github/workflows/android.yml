@@ -14,14 +14,14 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
           
-      - name: Build with Gradle
+      - name: Setup Gradle Wrapper
         run: |
-          # 1. إنشاء ملف gradlew وضبطه للعمل
-          gradle wrapper --gradle-version 7.5
+          gradle wrapper --gradle-version 7.4.2
           chmod +x gradlew
           
-          # 2. تنفيذ البناء بأمر مباشر وتجاوز أي تعارضات
-          ./gradlew assembleDebug --no-daemon --stacktrace
+      - name: Build with Gradle
+        run: |
+          ./gradlew :app:assembleDebug --no-daemon --stacktrace
         
       - name: Upload APK
         uses: actions/upload-artifact@v4
