@@ -14,13 +14,10 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
           
-      - name: Initialize Gradle
-        run: |
-          gradle wrapper --gradle-version 7.4.2
-          chmod +x gradlew
-          
       - name: Build with Gradle
-        run: ./gradlew :app:assembleDebug --no-daemon
+        run: |
+          # استخدام الإعدادات التي عرفناها في settings.gradle
+          ./gradlew :app:assembleDebug --no-daemon
         
       - name: Upload APK
         uses: actions/upload-artifact@v4
