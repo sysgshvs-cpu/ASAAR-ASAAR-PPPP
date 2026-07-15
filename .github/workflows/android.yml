@@ -14,9 +14,10 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
           
-      # هذا الأمر يستخدم أداة gradle المثبتة مسبقاً في النظام
       - name: Build with Gradle
-        run: gradle assembleDebug
+        run: |
+          gradle wrapper
+          ./gradlew assembleDebug
         
       - name: Upload APK
         uses: actions/upload-artifact@v4
