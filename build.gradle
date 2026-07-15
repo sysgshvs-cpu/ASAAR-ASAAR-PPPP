@@ -1,5 +1,19 @@
 buildscript {
-    repositories { google() }
-    dependencies { classpath 'com.android.tools.build:gradle:7.2.0' }
+    repositories {
+        google()
+        mavenCentral()
+        gradlePluginPortal()
+    }
+    dependencies {
+        // تحديث نسخة البلاجن لضمان توافقها مع خوادم GitHub
+        classpath 'com.android.tools.build:gradle:7.4.2'
+    }
 }
-allprojects { repositories { google() } }
+
+allprojects {
+    repositories {
+        google()
+        mavenCentral()
+        maven { url 'https://jitpack.io' }
+    }
+}
