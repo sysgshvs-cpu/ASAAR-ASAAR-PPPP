@@ -1,9 +1,11 @@
+// Top-level build file
 buildscript {
     repositories {
         google()
         mavenCentral()
     }
     dependencies {
+        // نحدد إصدار البلاجن هنا
         classpath 'com.android.tools.build:gradle:7.4.2'
     }
 }
