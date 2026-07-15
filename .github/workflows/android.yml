@@ -16,8 +16,12 @@ jobs:
           
       - name: Build with Gradle
         run: |
-          # نستخدم Gradle المباشر مع إصدار Java 17
-          gradle :app:assembleDebug --no-daemon
+          # 1. إنشاء ملف gradlew وضبطه للعمل
+          gradle wrapper --gradle-version 7.5
+          chmod +x gradlew
+          
+          # 2. تنفيذ البناء بأمر مباشر وتجاوز أي تعارضات
+          ./gradlew assembleDebug --no-daemon --stacktrace
         
       - name: Upload APK
         uses: actions/upload-artifact@v4
